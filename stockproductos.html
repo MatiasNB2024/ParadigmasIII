@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock de Productos</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .price-container {
+            display: flex;
+            align-items: center;
+        }
+        .price-container span {
+            margin-right: 5px;
+        }
+        input[type="submit"] {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            display: block;
+        }
+        .image-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        .edit-button {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Stock de Productos</h2>
+
+<form onsubmit="return saveProduct()">
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Imagen del Producto</th>
+                <th>Descripción del Producto</th>
+                <th>Cantidad en Stock</th>
+                <th>Fecha Actual</th>
+                <th>Precio Actual</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="image-upload">
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview2')" style="display:none;" id="fileInput2">
+                        <label for="fileInput2">Seleccionar Imagen</label>
+                        <img id="preview2" class="preview" alt="No se ha seleccionado ningún archivo" style="display:none;">
+                    </div>
+                </td>
+                <td><input type="text" id="description" placeholder="Descripción del Producto"></td>
+                <td><input type="number" id="quantity" placeholder="Cantidad en Stock" min="0"></td>
+                <td><input type="date" id="currentDate"></td>
+                <td>
+                    <div class="price-container">
+                        <span>$</span><input type="number" id="price" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </td>
+                <td><input type="submit" value="Guardar"></td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="error" id="errorMessage">Por favor, complete todos los campos antes de guardar.</p>
+</form>
+
+<script>
+    function previewImage(event, previewId) {
+        const input = event.target;
+        const reader = new FileReader();
+
+        reader.onload = function(){
+            const output = document.getElementById(previewId);
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            const output = document.getElementById(previewId);
+            output.src = "";
+            output.style.display = 'none';
+            alert("No se ha seleccionado ningún archivo");
+        }
+    }
+
+    function saveProduct() {
+        const description = document.getElementById('description').value;
+        const quantity = document.getElementById('quantity').value;
+        const currentDate = document.getElementById('currentDate').value;
+        const price = document.getElementById('price').value;
+        const image = document.getElementById('preview2').src;
+
+        if (!description || !quantity || !currentDate || !price || image === "") {
+            document.getElementById('errorMessage').style.display = 'block';
+            return false;
+        }
+
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        newRow.innerHTML = `
+            <td><img src="${image}" class="preview"></td>
+            <td contenteditable="true">${description}</td>
+            <td contenteditable="true">${quantity}</td>
+            <td contenteditable="true">${currentDate}</td>
+            <td contenteditable="true">$${parseFloat(price).toFixed(2)}</td>
+            <td><button class="edit-button" onclick="editProduct(this)">Editar</button></td>
+        `;
+
+        // Borra los campos de entrada después de guardar el producto
+        document.getElementById('description').value = '';
+        document.getElementById('quantity').value = '';
+        document.getElementById('currentDate').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('fileInput2').value = '';
+        document.getElementById('preview2').src = '';
+        document.getElementById('preview2').style.display = 'none';
+
+        document.getElementById('errorMessage').style.display = 'none';
+
+        return false; // Evita la recarga de la página
+    }
+
+    function editProduct(button) {
+        const row = button.parentElement.parentElement;
+        const cells = row.getElementsByTagName('td');
+
+        for (let i = 1; i < cells.length - 1; i++) {
+            cells[i].setAttribute('contenteditable', 'true');
+        }
+
+        button.textContent = "Guardar";
+        button.onclick = function() {
+            saveEdits(button);
+        };
+    }
+
+    function saveEdits(button) {
+        const row = button.parentElement.parentElement;
+        const cells = row.getElementsByTagName('td');
+
+        for (let i = 1; i < cells.length - 1; i++) {
+            cells[i].setAttribute('contenteditable', 'false');
+        }
+
+        button.textContent = "Editar";
+        button.onclick = function() {
+            editProduct(button);
+        };
+    }
+</script>
+
+</body>
+</html>
