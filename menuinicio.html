@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Stock - Menú de Inicio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            overflow: hidden;
+            background-color: #333;
+            padding: 10px;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .navbar a.logout {
+            float: right;
+            background-color: #f44336;
+            color: white;
+        }
+        .navbar a.logout:hover {
+            background-color: #e41f1f;
+            color: white;
+        }
+        .container {
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .menu-options {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .menu-option {
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 10px;
+            font-size: 20px;
+        }
+        .menu-option:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="menuinicio.html">Inicio</a>
+        <a href="stockproductos.html">Stock de Productos</a>
+        <a href="productosrecibidos.html">Productos Recibidos</a>
+        <a href="entregarproducos.html">Productos a Entregar</a>
+        <a href="iniciosesion.html" class="logout">Cerrar Sesión</a>
+    </div>
+
+    <div class="container">
+        <h1>Bienvenido al Sistema de Gestión de Stock</h1>
+        <div class="menu-options">
+            <a href="stockproductos.html" class="menu-option">Stock de Productos</a>
+            <a href="productosrecibidos.html" class="menu-option">Productos Recibidos</a>
+            <a href="entregarproductos.html" class="menu-option">Productos a Entregar</a>
+        </div>
+    </div>
+
+</body>
+</html>
