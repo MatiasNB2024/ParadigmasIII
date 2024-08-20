@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos Recibidos</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .price-container {
+            display: flex;
+            align-items: center;
+        }
+        .price-container span {
+            margin-right: 5px;
+        }
+        input[type="submit"] {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .preview {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            display: block;
+        }
+        .image-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Productos Recibidos</h2>
+
+<form onsubmit="return saveProduct()">
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Imagen del Producto</th>
+                <th>Descripción del Producto</th>
+                <th>Cantidad Recibida</th>
+                <th>Fecha de Compra</th>
+                <th>Precio de Compra</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="image-upload">
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview3')" style="display:none;" id="fileInput3">
+                        <label for="fileInput3">Seleccionar Imagen</label>
+                        <img id="preview3" class="preview" alt="No se ha seleccionado ningún archivo" style="display:none;">
+                    </div>
+                </td>
+                <td><input type="text" id="description" placeholder="Descripción del Producto"></td>
+                <td><input type="number" id="quantityReceived" placeholder="Cantidad Recibida" min="0"></td>
+                <td><input type="date" id="purchaseDate"></td>
+                <td>
+                    <div class="price-container">
+                        <span>$</span><input type="number" id="price" placeholder="0.00" min="0" step="0.01">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p class="error" id="errorMessage">Por favor, complete todos los campos antes de guardar.</p>
+    <input type="submit" value="Guardar">
+</form>
+
+<script>
+    function previewImage(event, previewId) {
+        const input = event.target;
+        const reader = new FileReader();
+
+        reader.onload = function(){
+            const output = document.getElementById(previewId);
+            output.src = reader.result;
+            output.style.display = 'block';
+        };
+
+        if (input.files && input.files[0]) {
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            const output = document.getElementById(previewId);
+            output.src = "";
+            output.style.display = 'none';
+            alert("No se ha seleccionado ningún archivo");
+        }
+    }
+
+    function saveProduct() {
+        const description = document.getElementById('description').value;
+        const quantityReceived = document.getElementById('quantityReceived').value;
+        const purchaseDate = document.getElementById('purchaseDate').value;
+        const price = document.getElementById('price').value;
+        const image = document.getElementById('preview3').src;
+
+        if (!description || !quantityReceived || !purchaseDate || !price || image === "") {
+            document.getElementById('errorMessage').style.display = 'block';
+            return false;
+        }
+
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+
+        const newCell1 = newRow.insertCell(0);
+        const newCell2 = newRow.insertCell(1);
+        const newCell3 = newRow.insertCell(2);
+        const newCell4 = newRow.insertCell(3);
+        const newCell5 = newRow.insertCell(4);
+
+        newCell1.innerHTML = `<img src="${image}" class="preview">`;
+        newCell2.textContent = description;
+        newCell3.textContent = quantityReceived;
+        newCell4.textContent = purchaseDate;
+        newCell5.textContent = `$${parseFloat(price).toFixed(2)}`;
+
+        // Borra los campos de entrada después de guardar el producto
+        document.getElementById('description').value = '';
+        document.getElementById('quantityReceived').value = '';
+        document.getElementById('purchaseDate').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('fileInput3').value = '';
+        document.getElementById('preview3').src = '';
+        document.getElementById('preview3').style.display = 'none';
+
+        document.getElementById('errorMessage').style.display = 'none';
+
+        return false; // Evita la recarga de la página
+    }
+</script>
+
+</body>
+</html>
