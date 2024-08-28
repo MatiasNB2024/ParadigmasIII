@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Stock - Inicio de Sesión</title>
     <style>
+        /* [Estilos generales del cuerpo]
+           - Se define la fuente, el color de fondo, y se utiliza Flexbox para centrar el contenido vertical y horizontalmente.
+           - Se establece la altura en 100vh para que ocupe toda la pantalla. */
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
@@ -13,6 +16,10 @@
             align-items: center;
             height: 100vh;
         }
+
+        /* [Estilos del contenedor de login]
+           - Se define el fondo blanco, el padding interno, el borde redondeado y la sombra.
+           - El ancho del contenedor está limitado a 300px y el texto está centrado. */
         .login-container {
             background-color: #fff;
             padding: 20px;
@@ -21,15 +28,26 @@
             width: 300px;
             text-align: center;
         }
+
+        /* [Estilos de la imagen de login]
+           - La imagen se centra dentro del contenedor y tiene un margen inferior.
+           - Su tamaño es ajustable para que no exceda el contenedor. */
         .login-container img {
             display: block;
             margin: 0 auto 20px;
             max-width: 100%;
             height: auto;
         }
+
+        /* [Estilos del encabezado (h2)]
+           - Se establece un margen inferior para separar el título del resto del contenido. */
         .login-container h2 {
             margin-bottom: 20px;
         }
+
+        /* [Estilos de los campos de entrada (email y password)]
+           - Los campos se ajustan al 100% del contenedor.
+           - Se define padding interno, margen, borde y esquinas redondeadas. */
         .login-container input[type="email"],
         .login-container input[type="password"] {
             width: 100%;
@@ -38,6 +56,11 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        /* [Estilo del botón de envío]
+           - El botón ocupa el 100% del contenedor.
+           - Se define el color de fondo, el tamaño del texto, y el estilo del borde.
+           - Cambia de color al pasar el ratón por encima. */
         .login-container input[type="submit"] {
             width: 100%;
             padding: 10px;
@@ -48,9 +71,14 @@
             font-size: 16px;
             cursor: pointer;
         }
+
         .login-container input[type="submit"]:hover {
             background-color: #45a049;
         }
+
+        /* [Estilo del mensaje de error]
+           - Define el color rojo del texto y un margen superior.
+           - El mensaje está oculto por defecto y solo se muestra cuando es necesario. */
         .error-message {
             color: red;
             margin-top: 10px;
@@ -58,6 +86,11 @@
         }
     </style>
     <script>
+        /* [Función de inicio de sesión]
+           - Previene el envío del formulario.
+           - Compara las credenciales ingresadas con las credenciales correctas.
+           - Muestra un mensaje de error si las credenciales son incorrectas.
+           - Redirige al menú principal si las credenciales son correctas. */
         function login(event) {
             event.preventDefault(); // Previene el envío del formulario
 
@@ -87,6 +120,9 @@
 </head>
 <body>
 
+<!-- [Contenedor del formulario de inicio de sesión]
+     - Incluye la imagen, el título, los campos de correo y contraseña, y el botón para iniciar sesión.
+     - También muestra mensajes de error si el login falla. -->
 <div class="login-container">
     <img src="C:\Users\mnben\Downloads\stockimage.jpeg" alt="Imagen de Login">
     <h2>Inicio de Sesión</h2>
@@ -102,3 +138,4 @@
 
 </body>
 </html>
+
