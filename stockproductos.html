@@ -5,24 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock de Productos</title>
     <style>
+        /* Estilo para la tabla, ocupando el 100% del ancho y colapsando los bordes */
         table {
             width: 100%;
             border-collapse: collapse;
         }
+        /* Estilo para las celdas de la tabla, con bordes y padding */
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+        /* Estilo para las cabeceras de la tabla, con fondo verde y texto blanco */
         th {
             background-color: #4CAF50;
             color: white;
         }
+        /* Estilo para los campos de entrada de texto, fecha y número, ocupando el 100% del ancho */
         input[type="text"], input[type="date"], input[type="number"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
         }
+        /* Contenedor para el precio, mostrando un signo de dólar antes del input */
         .price-container {
             display: flex;
             align-items: center;
@@ -30,6 +35,7 @@
         .price-container span {
             margin-right: 5px;
         }
+        /* Estilo para el botón de submit */
         input[type="submit"] {
             margin-top: 20px;
             padding: 10px 20px;
@@ -38,31 +44,30 @@
             border: none;
             cursor: pointer;
         }
+        /* Estilo para el botón de submit al pasar el ratón por encima */
         input[type="submit"]:hover {
             background-color: #45a049;
         }
+        /* Estilo para la vista previa de la imagen, centrado y con tamaño máximo */
         .preview {
             max-width: 100px;
             max-height: 100px;
             margin-top: 10px;
             display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
+        /* Contenedor para la carga de imágenes, centrado en la columna */
         .image-upload {
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
         }
+        /* Estilo para el mensaje de error, inicialmente oculto */
         .error {
             color: red;
             display: none;
-        }
-        .edit-button {
-            background-color: #FFA500;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -70,33 +75,36 @@
 
 <h2>Stock de Productos</h2>
 
+<!-- Formulario para la gestión del stock de productos -->
 <form onsubmit="return saveProduct()">
     <table id="productTable">
         <thead>
             <tr>
                 <th>Imagen del Producto</th>
                 <th>Descripción del Producto</th>
-                <th>Cantidad en Stock</th>
-                <th>Fecha Actual</th>
-                <th>Precio Actual</th>
+                <th>Cantidad</th>
+                <th>Fecha de Ingreso</th>
+                <th>Proveedor</th>
+                <th>Precio Unitario</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
+            <!-- Fila para ingresar un nuevo producto -->
             <tr>
                 <td>
                     <div class="image-upload">
-                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview2')" style="display:none;" id="fileInput2">
-                        <label for="fileInput2">Seleccionar Imagen</label>
-                        <img id="preview2" class="preview" alt="No se ha seleccionado ningún archivo" style="display:none;">
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview')" id="fileInput">
+                        <img id="preview" class="preview" alt="" style="display:none;">
                     </div>
                 </td>
-                <td><input type="text" id="description" placeholder="Descripción del Producto"></td>
-                <td><input type="number" id="quantity" placeholder="Cantidad en Stock" min="0"></td>
-                <td><input type="date" id="currentDate"></td>
+                <td><input type="text" id="productName" placeholder="Nombre del Producto"></td>
+                <td><input type="number" id="quantity" placeholder="Cantidad" min="0"></td>
+                <td><input type="date" id="entryDate"></td>
+                <td><input type="text" id="supplier" placeholder="Proveedor"></td>
                 <td>
                     <div class="price-container">
-                        <span>$</span><input type="number" id="price" placeholder="0.00" min="0" step="0.01">
+                        <span>$</span><input type="number" id="unitPrice" placeholder="0.00" min="0" step="0.01">
                     </div>
                 </td>
                 <td><input type="submit" value="Guardar"></td>
@@ -107,6 +115,30 @@
 </form>
 
 <script>
+    /* Carga los productos almacenados en localStorage y los muestra en la tabla */
+    function loadProducts() {
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+
+        storedProducts.forEach((product, index) => {
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <div class="image-upload">
+                        <img src="${product.image}" class="preview">
+                    </div>
+                </td>
+                <td contenteditable="true">${product.productName}</td>
+                <td contenteditable="true">${product.quantity}</td>
+                <td contenteditable="true">${product.entryDate}</td>
+                <td contenteditable="true">${product.supplier}</td>
+                <td contenteditable="true">$${parseFloat(product.unitPrice).toFixed(2)}</td>
+                <td><button class="edit-button" onclick="editProduct(this, ${index})">Editar</button></td>
+            `;
+        });
+    }
+
+    /* Muestra una vista previa de la imagen seleccionada por el usuario */
     function previewImage(event, previewId) {
         const input = event.target;
         const reader = new FileReader();
@@ -123,75 +155,139 @@
             const output = document.getElementById(previewId);
             output.src = "";
             output.style.display = 'none';
-            alert("No se ha seleccionado ningún archivo");
         }
     }
 
+    /* Guarda el producto ingresado en localStorage y lo muestra en la tabla */
     function saveProduct() {
-        const description = document.getElementById('description').value;
+        const productName = document.getElementById('productName').value;
         const quantity = document.getElementById('quantity').value;
-        const currentDate = document.getElementById('currentDate').value;
-        const price = document.getElementById('price').value;
-        const image = document.getElementById('preview2').src;
+        const entryDate = document.getElementById('entryDate').value;
+        const supplier = document.getElementById('supplier').value;
+        const unitPrice = document.getElementById('unitPrice').value;
+        const image = document.getElementById('preview').src;
 
-        if (!description || !quantity || !currentDate || !price || image === "") {
+        /* Valida que todos los campos estén completos antes de guardar */
+        if (!productName || !quantity || !entryDate || !supplier || !unitPrice || image === "") {
             document.getElementById('errorMessage').style.display = 'block';
             return false;
         }
 
+        /* Recupera los productos almacenados en localStorage y agrega el nuevo producto */
+        const storedProducts = JSON.parse(localStorage.getItem('products')) || [];
+        storedProducts.push({
+            productName,
+            quantity,
+            entryDate,
+            supplier,
+            unitPrice,
+            image
+        });
+
+        /* Guarda el nuevo arreglo de productos en localStorage */
+        localStorage.setItem('products', JSON.stringify(storedProducts));
+
+        /* Añade una nueva fila con el producto guardado a la tabla */
         const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow();
 
         newRow.innerHTML = `
-            <td><img src="${image}" class="preview"></td>
-            <td contenteditable="true">${description}</td>
+            <td>
+                <div class="image-upload">
+                    <img src="${image}" class="preview">
+                </div>
+            </td>
+            <td contenteditable="true">${productName}</td>
             <td contenteditable="true">${quantity}</td>
-            <td contenteditable="true">${currentDate}</td>
-            <td contenteditable="true">$${parseFloat(price).toFixed(2)}</td>
+            <td contenteditable="true">${entryDate}</td>
+            <td contenteditable="true">${supplier}</td>
+            <td contenteditable="true">$${parseFloat(unitPrice).toFixed(2)}</td>
             <td><button class="edit-button" onclick="editProduct(this)">Editar</button></td>
         `;
 
-        // Borra los campos de entrada después de guardar el producto
-        document.getElementById('description').value = '';
+        /* Limpia los campos del formulario después de guardar el producto */
+        document.getElementById('productName').value = '';
         document.getElementById('quantity').value = '';
-        document.getElementById('currentDate').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('fileInput2').value = '';
-        document.getElementById('preview2').src = '';
-        document.getElementById('preview2').style.display = 'none';
+        document.getElementById('entryDate').value = '';
+        document.getElementById('supplier').value = '';
+        document.getElementById('unitPrice').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('preview').src = '';
+        document.getElementById('preview').style.display = 'none';
 
         document.getElementById('errorMessage').style.display = 'none';
 
-        return false; // Evita la recarga de la página
+        return false;
     }
 
-    function editProduct(button) {
+    /* Permite editar un producto existente en la tabla */
+    function editProduct(button, index) {
         const row = button.parentElement.parentElement;
         const cells = row.getElementsByTagName('td');
 
+        /* Permite seleccionar una nueva imagen para el producto */
+        const imageUploadDiv = cells[0].querySelector('.image-upload');
+        const currentImage = imageUploadDiv.querySelector('img').src;
+        imageUploadDiv.innerHTML = `
+            <input type="file" accept="image/*" onchange="previewImage(event, 'preview_${index}')">
+            <img id="preview_${index}" class="preview" src="${currentImage}" style="display: block;">
+        `;
+
+        /* Habilita la edición de los campos de texto en la fila seleccionada */
         for (let i = 1; i < cells.length - 1; i++) {
             cells[i].setAttribute('contenteditable', 'true');
         }
 
         button.textContent = "Guardar";
         button.onclick = function() {
-            saveEdits(button);
+            saveEdits(button, index);
         };
     }
 
-    function saveEdits(button) {
+    /* Guarda los cambios realizados a un producto existente */
+    function saveEdits(button, index) {
         const row = button.parentElement.parentElement;
         const cells = row.getElementsByTagName('td');
 
+        /* Guarda la nueva imagen seleccionada */
+        const imageUploadDiv = cells[0].querySelector('.image-upload');
+        const newImage = imageUploadDiv.querySelector('img').src;
+        imageUploadDiv.innerHTML = `
+            <img src="${newImage}" class="preview">
+        `;
+
+        /* Obtiene los valores editados y actualiza el producto en localStorage */
+        const productName = cells[1].textContent;
+        const quantity = cells[2].textContent;
+        const entryDate = cells[3].textContent;
+        const supplier = cells[4].textContent;
+        const unitPrice = cells[5].textContent.replace('$', '');
+
+        const storedProducts = JSON.parse(localStorage.getItem('products'));
+        storedProducts[index] = {
+            productName,
+            quantity,
+            entryDate,
+            supplier,
+            unitPrice,
+            image: newImage
+        };
+
+        localStorage.setItem('products', JSON.stringify(storedProducts));
+
+        /* Desactiva la edición de los campos y vuelve a mostrar el botón "Editar" */
         for (let i = 1; i < cells.length - 1; i++) {
-            cells[i].setAttribute('contenteditable', 'false');
+            cells[i].removeAttribute('contenteditable');
         }
 
         button.textContent = "Editar";
         button.onclick = function() {
-            editProduct(button);
+            editProduct(button, index);
         };
     }
+
+    /* Carga los productos cuando se carga la página */
+    window.onload = loadProducts;
 </script>
 
 </body>
