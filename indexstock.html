@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <style>
+        /* [Configuración general del cuerpo y html]
+           - Se establece la altura y el margen en 0 para que la página ocupe toda la pantalla.
+           - Se define la fuente global para toda la página.
+           - Se utiliza Flexbox para centrar el contenido en el centro de la pantalla.
+           - Se establece una imagen de fondo que cubre toda la pantalla. */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('pexels-photo-4483610.jpeg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* [Estilos del contenedor de contenido]
+           - Se aplica un fondo blanco con un borde redondeado.
+           - El contenedor tiene un padding interno para el espaciado.
+           - Se centra el texto y se establece un borde celeste alrededor. */
+        .content {
+            background-color: rgb(255, 255, 255); /* Fondo blanco */
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+            border: 7px solid #00BFFF; /* Línea celeste alrededor del cuadro */
+        }
+
+        /* [Estilo del encabezado (h1)]
+           - Se define el color del texto del título y se agrega un margen inferior. */
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* [Estilo del párrafo (p)]
+           - Se define el color del texto del párrafo y se agrega un margen inferior. */
+        p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+
+        /* [Estilo del botón de acción]
+           - Se define el padding, color, y estilo del botón.
+           - Se redondean los bordes y se cambia el color cuando el botón se pasa por encima (hover). */
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<!-- [Contenedor principal del contenido]
+     - Contiene el título, la descripción y el botón para iniciar sesión. -->
+<div class="content">
+    <h1>Bienvenido a la Gestión de Stock</h1>
+    <p>Por favor, inicie sesión para continuar.</p>
+    <a href="iniciosesion.html" class="button">Iniciar Sesión</a>
+</div>
+
+</body>
+</html>
