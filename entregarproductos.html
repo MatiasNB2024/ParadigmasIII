@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos a Entregar</title>
+    <title>Productos Para Entregar</title>
     <style>
+        /* Estilos básicos para la tabla, inputs y botones */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -46,6 +47,8 @@
             max-height: 100px;
             margin-top: 10px;
             display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .image-upload {
             display: flex;
@@ -57,46 +60,87 @@
             color: red;
             display: none;
         }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #e53935;
+        }
     </style>
 </head>
 <body>
 
-<h2>Productos a Entregar</h2>
+<h2>Productos Para Entregar</h2>
 
 <form onsubmit="return saveProduct()">
     <table id="productTable">
         <thead>
             <tr>
                 <th>Imagen del Producto</th>
-                <th>Descripción del Producto</th>
+                <th>Descripcion del Producto</th>
+                <th>Cantidad</th>
                 <th>Fecha de Entrega</th>
-                <th>Precio de Venta</th>
+                <th>Cliente</th>
+                <th>Precio de Venta por Unidad</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>
                     <div class="image-upload">
-                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview1')" style="display:none;" id="fileInput1">
-                        <label for="fileInput1">Seleccionar Imagen</label>
-                        <img id="preview1" class="preview" alt="No se ha seleccionado ningún archivo" style="display:none;">
+                        <input type="file" accept="image/*" onchange="previewImage(event, 'preview')" id="fileInput">
+                        <img id="preview" class="preview" alt="" style="display:none;">
                     </div>
                 </td>
-                <td><input type="text" id="description" placeholder="Descripción del Producto"></td>
-                <td><input type="date" id="deliveryDate" placeholder="Fecha de Entrega"></td>
+                <td><input type="text" id="productName" placeholder="Nombre del Producto"></td>
+                <td><input type="number" id="quantity" placeholder="Cantidad" min="0"></td>
+                <td><input type="date" id="deliveryDate"></td>
+                <td><input type="text" id="client" placeholder="Cliente"></td>
                 <td>
                     <div class="price-container">
-                        <span>$</span><input type="number" id="price" placeholder="0.00" min="0" step="0.01">
+                        <span>$</span><input type="number" id="salePrice" placeholder="0.00" min="0" step="0.01">
                     </div>
                 </td>
+                <td><input type="submit" value="Guardar"></td>
             </tr>
         </tbody>
     </table>
     <p class="error" id="errorMessage">Por favor, complete todos los campos antes de guardar.</p>
-    <input type="submit" value="Guardar">
 </form>
 
 <script>
+    /* Carga los productos almacenados en localStorage al cargar la página */
+    function loadProducts() {
+        const storedProducts = JSON.parse(localStorage.getItem('deliveryProducts')) || [];
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+
+        storedProducts.forEach((product, index) => {
+            const newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>
+                    <div class="image-upload">
+                        <img src="${product.image}" class="preview">
+                    </div>
+                </td>
+                <td contenteditable="true">${product.productName}</td>
+                <td contenteditable="true">${product.quantity}</td>
+                <td contenteditable="true">${product.deliveryDate}</td>
+                <td contenteditable="true">${product.client}</td>
+                <td contenteditable="true">$${parseFloat(product.salePrice).toFixed(2)}</td>
+                <td>
+                    <button class="edit-button" onclick="editProduct(this, ${index})">Editar</button>
+                    <button class="delete-button" onclick="deleteProduct(${index})">Eliminar</button>
+                </td>
+            `;
+        });
+    }
+
+    /* Muestra la vista previa de la imagen seleccionada */
     function previewImage(event, previewId) {
         const input = event.target;
         const reader = new FileReader();
@@ -113,46 +157,140 @@
             const output = document.getElementById(previewId);
             output.src = "";
             output.style.display = 'none';
-            alert("No se ha seleccionado ningún archivo");
         }
     }
 
+    /* Guarda un nuevo producto en localStorage y lo añade a la tabla */
     function saveProduct() {
-        const description = document.getElementById('description').value;
+        const productName = document.getElementById('productName').value;
+        const quantity = document.getElementById('quantity').value;
         const deliveryDate = document.getElementById('deliveryDate').value;
-        const price = document.getElementById('price').value;
-        const image = document.getElementById('preview1').src;
+        const client = document.getElementById('client').value;
+        const salePrice = document.getElementById('salePrice').value;
+        const image = document.getElementById('preview').src;
 
-        if (!description || !deliveryDate || !price || image === "") {
+        if (!productName || !quantity || !deliveryDate || !client || !salePrice || image === "") {
             document.getElementById('errorMessage').style.display = 'block';
             return false;
         }
 
+        const storedProducts = JSON.parse(localStorage.getItem('deliveryProducts')) || [];
+        storedProducts.push({
+            productName,
+            quantity,
+            deliveryDate,
+            client,
+            salePrice,
+            image
+        });
+
+        localStorage.setItem('deliveryProducts', JSON.stringify(storedProducts));
+
         const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow();
 
-        const newCell1 = newRow.insertCell(0);
-        const newCell2 = newRow.insertCell(1);
-        const newCell3 = newRow.insertCell(2);
-        const newCell4 = newRow.insertCell(3);
+        newRow.innerHTML = `
+            <td>
+                <div class="image-upload">
+                    <img src="${image}" class="preview">
+                </div>
+            </td>
+            <td contenteditable="true">${productName}</td>
+            <td contenteditable="true">${quantity}</td>
+            <td contenteditable="true">${deliveryDate}</td>
+            <td contenteditable="true">${client}</td>
+            <td contenteditable="true">$${parseFloat(salePrice).toFixed(2)}</td>
+            <td>
+                <button class="edit-button" onclick="editProduct(this)">Editar</button>
+                <button class="delete-button" onclick="deleteProduct(${storedProducts.length - 1})">Eliminar</button>
+            </td>
+        `;
 
-        newCell1.innerHTML = `<img src="${image}" class="preview">`;
-        newCell2.textContent = description;
-        newCell3.textContent = deliveryDate;
-        newCell4.textContent = `$${parseFloat(price).toFixed(2)}`;
-
-        // Borra los campos de entrada después de guardar el producto
-        document.getElementById('description').value = '';
+        /* Limpia el formulario después de guardar */
+        document.getElementById('productName').value = '';
+        document.getElementById('quantity').value = '';
         document.getElementById('deliveryDate').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('fileInput1').value = '';
-        document.getElementById('preview1').src = '';
-        document.getElementById('preview1').style.display = 'none';
+        document.getElementById('client').value = '';
+        document.getElementById('salePrice').value = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('preview').src = '';
+        document.getElementById('preview').style.display = 'none';
 
         document.getElementById('errorMessage').style.display = 'none';
 
-        return false; // Evita la recarga de la página
+        return false;
     }
+
+    /* Permite la edición de un producto existente */
+    function editProduct(button, index) {
+        const row = button.parentElement.parentElement;
+        const cells = row.getElementsByTagName('td');
+
+        const imageUploadDiv = cells[0].querySelector('.image-upload');
+        const currentImage = imageUploadDiv.querySelector('img').src;
+        imageUploadDiv.innerHTML = `
+            <input type="file" accept="image/*" onchange="previewImage(event, 'preview_${index}')">
+            <img id="preview_${index}" class="preview" src="${currentImage}" style="display: block;">
+        `;
+
+        for (let i = 1; i < cells.length - 1; i++) {
+            cells[i].setAttribute('contenteditable', 'true');
+        }
+
+        button.textContent = "Guardar";
+        button.onclick = function() {
+            saveEdits(button, index);
+        };
+    }
+
+    /* Guarda los cambios después de editar un producto */
+    function saveEdits(button, index) {
+        const row = button.parentElement.parentElement;
+        const cells = row.getElementsByTagName('td');
+
+        const imageUploadDiv = cells[0].querySelector('.image-upload');
+        const newImage = imageUploadDiv.querySelector('img').src;
+        imageUploadDiv.innerHTML = `
+            <img src="${newImage}" class="preview" style="display: block;">
+        `;
+
+        const editedProduct = {
+            image: newImage,
+            productName: cells[1].textContent,
+            quantity: cells[2].textContent,
+            deliveryDate: cells[3].textContent,
+            client: cells[4].textContent,
+            salePrice: cells[5].textContent.replace('$', '')
+        };
+
+        const storedProducts = JSON.parse(localStorage.getItem('deliveryProducts')) || [];
+        storedProducts[index] = editedProduct;
+        localStorage.setItem('deliveryProducts', JSON.stringify(storedProducts));
+
+        for (let i = 1; i < cells.length - 1; i++) {
+            cells[i].removeAttribute('contenteditable');
+        }
+
+        button.textContent = "Editar";
+        button.onclick = function() {
+            editProduct(button, index);
+        };
+    }
+
+    /* Elimina un producto de la tabla y localStorage */
+    function deleteProduct(index) {
+        const storedProducts = JSON.parse(localStorage.getItem('deliveryProducts')) || [];
+        storedProducts.splice(index, 1);
+        localStorage.setItem('deliveryProducts', JSON.stringify(storedProducts));
+
+        const table = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        table.deleteRow(index);
+
+        loadProducts();
+    }
+
+    /* Carga los productos al iniciar la página */
+    window.onload = loadProducts;
 </script>
 
 </body>
